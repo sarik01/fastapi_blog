@@ -26,7 +26,7 @@ async def get_post(item_id: int, session: AsyncSession = Depends(get_async_sessi
         return result.mappings().first()
     except Exception as e:
         print(e)
-        return {'status': 'not found!'}
+        return {'status': 'not found!'}, 404
 
 
 @router.get('/')
@@ -53,7 +53,7 @@ async def upd_post(new_post: OperationCreate, item_id: int,
             await session.commit()
 
             return {'status': 'success'}
-        return {'status', 'bad'}
+        return {'status', 'denied'}, 401
     except Exception as e:
         print(e)
         return {'status': 'bad'}, 400
@@ -90,7 +90,7 @@ async def delete_item(item_id: int, session: AsyncSession = Depends(get_async_se
 
             return {'status': 'success'}
         else:
-            return {'status': 'bad'}, 400
+            return {'status', 'denied'}, 401
 
     except Exception as e:
         print(e)
