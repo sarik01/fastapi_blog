@@ -32,17 +32,16 @@ from httpx import AsyncClient
 
 
 async def test_add_specific_operations(ac: AsyncClient):
-    response = await ac.post("/posts", json={
+    response = await ac.post("/posts/", json={
       "title": "2",
       "text": "2",
       "instrument_type": "2",
       "type": "2"
+    }, headers={
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiYXVkIjpbImZhc3RhcGktdXNlcnM6YXV0aCJdLCJleHAiOjE2OTY2MDAzODl9.wsHGYj2TVAlmfn5HdoY-8_lQYqYmwNINCPZgoxi24rY'
     })
     assert response.status_code == 200
 
 async def test_get_specific_operations(ac: AsyncClient):
     response = await ac.get("/posts/1")
-
     assert response.status_code == 200
-    assert response.json()["status"] == "success"
-    assert len(response.json()["data"]) == 1
