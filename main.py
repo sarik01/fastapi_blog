@@ -6,13 +6,13 @@ from redis import asyncio as aioredis
 from fastapi import FastAPI, Request, Depends
 from starlette.middleware.cors import CORSMiddleware
 
-from auth.models import User
-from auth.base_config import auth_backend
+from src.auth.models import User
+from src.auth.base_config import auth_backend
 
-from auth.manager import get_user_manager
-from auth.schemas import UserRead, UserCreate
-from operations.router import router
-from tasks.router import celery_router
+from src.auth.manager import get_user_manager
+from src.auth.schemas import UserRead, UserCreate
+from src.operations.router import router
+from src.tasks.router import celery_router
 
 app = FastAPI(
     title="Blog App"
@@ -54,7 +54,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    redis = aioredis.from_url(f"redis://localhost", encoding='utf-8', decode_responses=True)
+    redis = aioredis.from_url(f"redis://redis:6379", encoding='utf-8', decode_responses=True)
     FastAPICache.init(RedisBackend(redis), prefix='fastapi-cache')
 
 

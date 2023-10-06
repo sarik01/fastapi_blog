@@ -1,0 +1,128 @@
+version: "3"
+
+services:
+  fastapi:
+    build:
+      context: .
+    volumes:
+      - .:/fastapi_blog
+    environment:
+      - DB_HOST=database
+      - DB_NAME=fastapi
+      - DB_USER=postgres
+      - DB_PASS=123456
+      - DB_PORT=5432
+    command: >
+      sh  -c "gunicorn main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - database
+
+  database:
+    image: postgres:14.6-alpine
+    environment:
+      - POSTGRES_DB=fastapi
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+    ports:
+      - 5455:5432
+    expose:
+      - 5455
+    volumes:
+      - fastapi:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7.0.5-alpine
+    hostname: redis
+    ports:
+      - 16379:6379
+
+  worker:
+    build:
+      context: .
+    hostname: worker
+    entrypoint: celery
+    command:
+      -A src.tasks.tasks.celery worker  -n 1 -l info -P solo
+    volumes:
+      - .:/fastapi_blog
+    links:
+      - redis
+    depends_on:
+      - redis
+      - database
+      - rabbitmq
+    environment:
+      - DB_HOST=database
+      - DB_NAME=fastapi
+      - DB_USER=postgres
+      - DB_PASS=123456
+
+
+  scheduler:
+    build:
+      context: .
+    hostname: scheduler
+    entrypoint: celery
+    command:
+       -A src.tasks.tasks.celery celery_app beat
+    volumes:
+      - .:/fastapi_blog
+    links:
+      - redis
+    depends_on:
+      - redis
+      - database
+      - rabbitmq
+    environment:
+      - DB_HOST=database
+      - DB_NAME=fastapi
+      - DB_USER=postgres
+      - DB_PASS=123456
+
+
+  flower:
+    build:
+      context: .
+    hostname: flower
+    entrypoint: celery
+    command: -A src.tasks.tasks.celery  flower
+    volumes:
+      - .:/fastapi_blog
+    links:
+      - rabbitmq
+      - redis
+
+    depends_on:
+      - redis
+      - rabbitmq
+    ports:
+      - "5555:5555"
+
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    hostname: rabbitmq
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_VHOST=edm_vhost
+      - RABBITMQ_DEFAULT_USER=rmuser
+      - RABBITMQ_DEFAULT_PASS=123456
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 2147483648
+    ports:
+      - 15673:15672
+
+
+  # nginx:
+  #   build:
+  #     dockerfile: ./Dockerfile
+  #     context: ./docker/nginx/
+  #   container_name: edm_nginx
+  #   image: edm_nginx
+  #   depends_on:
+  #     - edm
+  #   ports:
+  #     - "80:80"
+
+volumes:
+  fastapi:

@@ -15,3 +15,12 @@ SMTP_USER = os.environ.get("SMTP_USER")
 
 REDIS_HOST = os.environ.get("REDIS_HOST")
 REDIS_PORT = os.environ.get("REDIS_PORT")
+
+CELERY_CONFIG = {
+    # 'broker_url': 'redis://redis:6379/0',
+    'broker_url': 'amqp://rmuser:123456@rabbitmq:5672/edm_vhost',
+    'result_backend': f'redis://redis:6379/0',
+    'task_ignore_results': True,
+    'broker_connection_retry_on_startup': True,
+
+}

@@ -5,11 +5,11 @@ from fastapi_cache.decorator import cache
 from sqlalchemy import select, insert, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from auth.base_config import current_active_user
-from auth.models import User, post
-from database import get_async_session
+from src.auth.base_config import current_active_user
+from src.auth.models import User, post
+from src.database import get_async_session
 
-from operations.schemas import OperationCreate
+from src.operations.schemas import OperationCreate
 
 router = APIRouter(
     prefix='/posts',

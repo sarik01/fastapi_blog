@@ -3,13 +3,22 @@ from email.message import EmailMessage
 
 from celery import Celery
 
-from config import SMTP_PASSWORD, SMTP_USER
+from src.config import SMTP_PASSWORD, SMTP_USER
+
+CELERY_CONFIG = {
+    # 'broker_url': 'redis://redis:6379/0',
+    'broker_url': 'amqp://rmuser:123456@rabbitmq:5672/edm_vhost',
+    'result_backend': f'redis://redis:6379/0',
+    'task_ignore_results': True,
+    'broker_connection_retry_on_startup': True,
+
+}
 
 SMTP_HOST = "smtp.gmail.com"
 SMTP_PORT = 465
 
-celery = Celery('tasks', broker='redis://localhost:6379')
-
+celery = Celery('tasks')
+celery.conf.update(CELERY_CONFIG)
 
 def get_email_template_dashboard(username: str):
     email = EmailMessage()
