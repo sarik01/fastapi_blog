@@ -4,14 +4,19 @@ from fastapi_cache.backends.redis import RedisBackend
 from fastapi_users import FastAPIUsers
 from redis import asyncio as aioredis
 from fastapi import FastAPI, Request, Depends
+from sqlalchemy import insert
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.middleware.cors import CORSMiddleware
 
-from src.auth.models import User
+
+from src.auth.models import User, role
 from src.auth.base_config import auth_backend
 
 from src.auth.manager import get_user_manager
 from src.auth.schemas import UserRead, UserCreate
+from src.database import get_async_session
 from src.operations.router import router
+from src.operations.schemas import Role
 from src.tasks.router import celery_router
 
 app = FastAPI(
@@ -59,3 +64,15 @@ async def startup_event():
 
 
 
+@app.post('/role')
+async def add_role(new_role: Role, session: AsyncSession = Depends(get_async_session)
+                   ):
+    try:
+        stmt = insert(role).values(**new_role.dict())
+        await session.execute(stmt)
+        await session.commit()
+
+        return {'status': 'success'}
+    except Exception as e:
+        print(e)
+        {'status': 'bad'}, 400
