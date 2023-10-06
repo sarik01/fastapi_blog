@@ -8,3 +8,7 @@ class OperationCreate(BaseModel):
     user_id: int
 
     type: str
+
+
+class Role(BaseModel):
+    name: str

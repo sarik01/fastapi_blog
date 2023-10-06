@@ -6,10 +6,10 @@ from sqlalchemy import select, insert, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.base_config import current_active_user
-from src.auth.models import User, post
+from src.auth.models import User, post, role
 from src.database import get_async_session
 
-from src.operations.schemas import OperationCreate
+from src.operations.schemas import OperationCreate, Role
 
 router = APIRouter(
     prefix='/posts',
@@ -56,6 +56,20 @@ async def upd_post(new_post: OperationCreate, item_id: int,
     except Exception as e:
         print(e)
         return {'status': 'bad'}, 400
+
+
+@router.post('/role')
+async def add_role(new_role: Role, session: AsyncSession = Depends(get_async_session)
+                   ):
+    try:
+        stmt = insert(role).values(**new_role.dict())
+        await session.execute(stmt)
+        await session.commit()
+
+        return {'status': 'success'}
+    except Exception as e:
+        print(e)
+        {'status': 'bad'}, 400
 
 
 @router.post('/')
