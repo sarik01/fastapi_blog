@@ -28,6 +28,7 @@ async def get_post(item_id: int, session: AsyncSession = Depends(get_async_sessi
         print(e)
         return {'status': 'not found!'}
 
+
 @router.get('/')
 @cache(expire=30)
 async def get_posts(session: AsyncSession = Depends(get_async_session)):
@@ -58,25 +59,11 @@ async def upd_post(new_post: OperationCreate, item_id: int,
         return {'status': 'bad'}, 400
 
 
-@router.post('/role')
-async def add_role(new_role: Role, session: AsyncSession = Depends(get_async_session)
-                   ):
-    try:
-        stmt = insert(role).values(**new_role.dict())
-        await session.execute(stmt)
-        await session.commit()
-
-        return {'status': 'success'}
-    except Exception as e:
-        print(e)
-        {'status': 'bad'}, 400
-
-
 @router.post('/')
 async def add_post(new_post: OperationCreate, session: AsyncSession = Depends(get_async_session),
                    user: User = Depends(current_active_user)):
     try:
-        stmt = insert(post).values(**new_post.dict())
+        stmt = insert(post).values(**new_post.dict(), user_id=user.id)
         await session.execute(stmt)
         await session.commit()
 
@@ -108,5 +95,3 @@ async def delete_item(item_id: int, session: AsyncSession = Depends(get_async_se
     except Exception as e:
         print(e)
         return {'status': 'bad'}, 400
-
-
