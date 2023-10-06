@@ -88,7 +88,7 @@ async def delete_item(item_id: int, session: AsyncSession = Depends(get_async_se
             await session.execute(stmt)
             await session.commit()
 
-            return {'status': 'success'}
+            return {'status': 'success'}, 204
         else:
             return {'status', 'denied'}, 401
 
