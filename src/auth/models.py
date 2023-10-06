@@ -3,9 +3,7 @@ from datetime import datetime
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTable
 from sqlalchemy import Table, Column, Integer, String, TIMESTAMP, ForeignKey, JSON, Boolean, MetaData, Text
 
-from src.database import Base
-
-metadata = MetaData()
+from src.database import Base, metadata
 
 role = Table(
     "role",
@@ -42,14 +40,3 @@ class User(SQLAlchemyBaseUserTable[int], Base):
 
 
 
-post = Table(
-    "post",
-    metadata,
-    Column("id", Integer, primary_key=True),
-    Column("title", String),
-    Column("text", Text),
-    Column("instrument_type", String, nullable=True),
-    Column("date", TIMESTAMP),
-    Column("type", String),
-    Column("user_id", Integer, ForeignKey(user.c.id)),
-)

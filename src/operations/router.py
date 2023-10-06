@@ -6,8 +6,9 @@ from sqlalchemy import select, insert, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.base_config import current_active_user
-from src.auth.models import User, post, role
+from src.auth.models import User, role
 from src.database import get_async_session
+from src.operations.models import post
 
 from src.operations.schemas import OperationCreate, Role
 

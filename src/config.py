@@ -9,6 +9,12 @@ DB_NAME = os.environ.get("DB_NAME")
 DB_USER = os.environ.get("DB_USER")
 DB_PASS = os.environ.get("DB_PASS")
 
+# DB_HOST = 'localhost'
+# DB_PORT = 5432
+# DB_NAME = 'test'
+# DB_USER = 'postgres'
+# DB_PASS = '123456'
+
 SECRET_AUTH = os.environ.get("SECRET_AUTH")
 SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD")
 SMTP_USER = os.environ.get("SMTP_USER")
